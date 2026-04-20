@@ -47,7 +47,8 @@ def load_config():
         config['SERVER'] = {
             'host': '127.0.0.1',
             'port': '5000',
-            'browser_mode': 'false'
+            'browser_mode': 'false',
+            'fetch_timeout': '15'
         }
         config['WEBVIEW'] = {
             'host': '127.0.0.1',
@@ -69,6 +70,9 @@ PORT = config.getint('SERVER', 'port', fallback=5000)
 
 # 是否使用浏览器模式（默认webview模式）
 BROWSER_MODE = config.getboolean('SERVER', 'browser_mode', fallback=False)
+
+# 数据爬取超时时间
+FETCH_TIMEOUT = config.getint('SERVER', 'fetch_timeout', fallback=15)
 
 # pywebview 窗口连接配置（可以与服务器绑定地址不同）
 WEBVIEW_HOST = config.get('WEBVIEW', 'host', fallback=HOST)
