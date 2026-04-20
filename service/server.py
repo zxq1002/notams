@@ -6,9 +6,8 @@ import sys
 import traceback
 from datetime import datetime
 from io import BytesIO
-from tkinter import filedialog
 
-import win32clipboard
+import pyperclip
 from PIL import Image
 from flask import Flask, jsonify, render_template, send_from_directory
 from flask import request
@@ -709,6 +708,7 @@ def fetch():
 
 @app.route('/save_image', methods=['POST'])
 def save_image():
+    from tkinter import filedialog
     try:
         data = request.get_json()
         default_name = data.get('default_name', 'notam_export.png')
@@ -738,22 +738,9 @@ def save_image():
             with open(file_path, 'wb') as f:
                 f.write(data)
             try:
-
-                # 从字节数据创建图片对象
-                img = Image.open(BytesIO(data))
-
-                # 转换为BMP格式用于剪贴板
-                output = BytesIO()
-                img.convert('RGB').save(output, 'BMP')
-                bmp_data = output.getvalue()[14:]  # 去掉BMP文件头
-
-                # 复制到剪贴板
-                win32clipboard.OpenClipboard()
-                win32clipboard.EmptyClipboard()
-                win32clipboard.SetClipboardData(win32clipboard.CF_DIB, bmp_data)
-                win32clipboard.CloseClipboard()
-
-                print("图片已复制到剪贴板")
+                # 复制保存后的文件绝对路径到剪贴板，作为替代图片的跨平台方案
+                pyperclip.copy(os.path.abspath(file_path))
+                print(f"图片保存成功，已将文件路径复制到剪贴板: {os.path.abspath(file_path)}")
             except Exception as e:
                 print(f"复制到剪贴板失败: {e}")
             return jsonify({"success": True, "filePath": os.path.abspath(file_path)})
