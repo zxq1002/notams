@@ -1,6 +1,5 @@
 import base64
 import logging
-import os
 import re
 import sys
 import traceback
@@ -8,12 +7,20 @@ from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 
+import webview
 import pyperclip
 from PIL import Image
 from flask import Flask, jsonify, render_template, send_from_directory
 from flask import request
 
 import config
+
+_window = None
+
+
+def set_window(window):
+    global _window
+    _window = window
 from service.fetch.FNS_NOTAM_ARCHIVE_SEARCH import FNS_NOTAM_ARCHIVE_SEARCH
 from service.fetch.FNS_NOTAM_SEARCH import FNS_NOTAM_SEARCH
 from service.fetch.dinsQueryWeb import dinsQueryWeb
@@ -709,7 +716,6 @@ def fetch():
 
 @app.route('/save_image', methods=['POST'])
 def save_image():
-    from tkinter import filedialog
     try:
         data = request.get_json()
         default_name = data.get('default_name', 'notam_export.png')
@@ -724,17 +730,22 @@ def save_image():
         header, encoded = data_url.split(",", 1)
         data = base64.b64decode(encoded)
 
-        # 弹出“另存为”对话框（在 webview/GUI 环境中正常工作）
-        file_path = filedialog.asksaveasfilename(
-            title="保存导出的图片",
-            initialfile=default_name,
-            defaultextension=f".{default_name.split('.')[-1]}",
-            filetypes=[
-                ("PNG 图片", "*.png"),
-                ("JPEG 图片", "*.jpg;*.jpeg"),
-                ("所有文件", "*.*")
-            ]
-        )
+        # 弹出“另存为”对话框（使用 pywebview 原生对话框）
+        file_path = None
+        if _window:
+            file_path = _window.create_file_dialog(
+                webview.SAVE_DIALOG,
+                directory="",
+                save_filename=default_name,
+                file_types=("PNG 图片 (*.png)", "JPEG 图片 (*.jpg;*.jpeg)", "所有文件 (*.*)")
+            )
+            # pywebview 返回的是 tuple 或者单字符串，取决于版本和 OS
+            if isinstance(file_path, (list, tuple)):
+                file_path = file_path[0] if file_path else None
+        else:
+            print("当前处于浏览器模式，无法使用原生保存对话框")
+            return jsonify({"success": False, "message": "浏览器模式暂不支持直接保存，请右键图片另存为"})
+
         if file_path:
             file_path_obj = Path(file_path).resolve()
             with open(file_path_obj, 'wb') as f:

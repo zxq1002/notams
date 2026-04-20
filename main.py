@@ -7,7 +7,7 @@ import webbrowser
 import webview
 
 import config
-from service.server import start_flask
+from service.server import start_flask, set_window
 
 
 def wait_for_server(host, port, timeout=5):
@@ -61,6 +61,7 @@ if __name__ == '__main__':
                 height=900,
                 min_size=(800, 600)
             )
+            set_window(window)
             webview.start()
         except KeyboardInterrupt:
             pass
