@@ -1,8 +1,12 @@
 import configparser
-import os
+from pathlib import Path
+
+# 项目根目录
+BASE_DIR = Path(__file__).resolve().parent
 
 # 是否使用 dins/fns/msa/msi 数据源
 FETCH_DINS = False
+# ... (rest of the file constants)
 FETCH_FNS = True
 FETCH_MSA = True  # 中国海事局
 FETCH_MSI = False  # U.S. Maritime Administration
@@ -34,10 +38,9 @@ ICAO_CODES_DEFAULT = " ".join([
 
 
 def load_config():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    config_file = os.path.join(current_dir, 'config.ini')
+    config_file = BASE_DIR / 'config.ini'
     config = configparser.ConfigParser()
-    if not os.path.exists(config_file):
+    if not config_file.exists():
         config['ICAO'] = {
             'codes': ICAO_CODES_DEFAULT
         }
@@ -53,7 +56,7 @@ def load_config():
         with open(config_file, 'w', encoding='utf-8') as f:
             f.write('# FIR/ICAO配置，填写你需要获取的航警所在的飞行情报区（FIR）代码或机场ICAO代码\n')
             config.write(f)
-    config.read(config_file, encoding='utf-8')
+    config.read(str(config_file), encoding='utf-8')
     return config
 
 
