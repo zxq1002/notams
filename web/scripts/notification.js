@@ -4,7 +4,7 @@ function showNotification(message, type = 'info') {
     if (old) old.remove();
 
     const div = document.createElement('div');
-    div.className = 'notification';
+    div.className = `notification notification-${type}`;
     div.textContent = message;
     document.body.appendChild(div);
 
@@ -12,7 +12,8 @@ function showNotification(message, type = 'info') {
     requestAnimationFrame(() => div.classList.add('show'));
 
     // 根据类型设置不同的显示时间
-    const duration = type === 'success' ? 4000 : 2000;
+    // 错误消息通常更重要，显示时间稍长
+    const duration = (type === 'error' || type === 'success') ? 4000 : 2500;
     
     setTimeout(() => {
         div.classList.remove('show');
