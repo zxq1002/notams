@@ -59,7 +59,7 @@ async function exportMapAsImage() {
 
       if (err) {
         console.error('导出失败:', err);
-        alert('导出失败：' + (err.message || '未知错误'));
+        showNotification('导出失败：' + (err.message || '未知错误'), 'error');
         return;
       }
 
@@ -141,7 +141,7 @@ async function exportMapAsImage() {
 
   } catch (error) {
     console.error('导出过程出错:', error);
-    alert('导出过程中发生错误: ' + error.message);
+    showNotification('导出过程中发生错误: ' + error.message, 'error');
     exportBtn.innerHTML = originalText;
     exportBtn.disabled = false;
     exportBtn.style.background = originalBg;

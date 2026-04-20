@@ -114,12 +114,12 @@ function drawWarning() {
     targ = targ.replace(/\s+/g, '');
     
     if (!coordPattern.test(targ)&&!coordPattern2.test(targ)&&!coordPattern3.test(targ)&&!coordPattern4.test(targ)) {
-        alert("请输入正确的航警，格式应包含有效的坐标\n（如：N394838E1005637-N391617E1005933-N392001E1021555-N395223E1021334\n或：074700N1200200E-081000N1203300E-081300N1203800E-071800N1212200E\n或：19-14.25N/112-28.12E、19-15.43N/112-56.63E、18-21.26N/112-59.02E和18-20.09N/112-30.66E）");
+        showNotification("请输入正确的航警格式，需包含有效坐标", "error");
         return;
     }
 
     if (!text) {
-        alert("请填写内容！");
+        showNotification("请填写航警内容", "error");
         return;
     }
     
@@ -130,7 +130,7 @@ function drawWarning() {
     // 解析坐标并绘制
     const parsedCoords = parseNotamCoordinates(text);
     if (!parsedCoords || parsedCoords.length < 3) {
-        alert("无法解析足够的坐标点（至少需要3个）");
+        showNotification("无法解析足够的坐标点（至少需要3个）", "error");
         return;
     }
 
@@ -432,10 +432,7 @@ function selfDrawNot(text, color, num) {
     if(coor==null){
         coor=processCoordinates4(text);
     }
-    // alert(coor);
-    // const time = text.match(timeRegex);
     const code = text.match(codeRegex);
-    // alert(coor[0]);
     drawNot(coor[0], "null", code, null, num, color, 1, "", "MANUAL");
 }
 

@@ -16,7 +16,7 @@ fetch('/fetch')
     })
     .catch(err => {
         console.error(err);
-        alert("获取航警失败，可能是网络问题或当前无相关航警。手动输入功能仍可使用。");
+        showNotification("获取航警失败，可能是网络问题或当前无相关航警。手动输入功能仍可使用。", "error");
     })
     .finally(() => loadingModal.style.display = 'none');
 
