@@ -1,0 +1,10 @@
+{
+  "workflow": "new-project",
+  "preferences": {
+    "auto_commit": false,
+    "tdd": false,
+    "tech_stack": "Python Flask + pywebview",
+    "python_version": ">=3.9",
+    "platforms": ["Windows", "macOS", "Linux"]
+  }
+}
