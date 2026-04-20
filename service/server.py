@@ -6,6 +6,7 @@ import sys
 import traceback
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 
 import pyperclip
 from PIL import Image
@@ -346,9 +347,9 @@ def extract_altitude(raw_message_lst):
 
 
 app = Flask(__name__)
-web_path = os.path.normpath('../web/')
-app.template_folder = os.path.join(web_path, 'templates')
-app.static_folder = os.path.join(web_path, 'static')
+web_path = config.BASE_DIR / 'web'
+app.template_folder = str(web_path / 'templates')
+app.static_folder = str(web_path / 'static')
 
 
 class LogCapture:
@@ -435,7 +436,7 @@ def load_stat(filename):
 
 @app.route('/scripts/<path:filename>')
 def load_scripts(filename):
-    return send_from_directory(os.path.join(web_path, 'scripts'), filename)
+    return send_from_directory(str(web_path / 'scripts'), filename)
 
 
 @app.route('/config')
@@ -735,15 +736,16 @@ def save_image():
             ]
         )
         if file_path:
-            with open(file_path, 'wb') as f:
+            file_path_obj = Path(file_path).resolve()
+            with open(file_path_obj, 'wb') as f:
                 f.write(data)
             try:
                 # 复制保存后的文件绝对路径到剪贴板，作为替代图片的跨平台方案
-                pyperclip.copy(os.path.abspath(file_path))
-                print(f"图片保存成功，已将文件路径复制到剪贴板: {os.path.abspath(file_path)}")
+                pyperclip.copy(str(file_path_obj))
+                print(f"图片保存成功，已将文件路径复制到剪贴板: {file_path_obj}")
             except Exception as e:
                 print(f"复制到剪贴板失败: {e}")
-            return jsonify({"success": True, "filePath": os.path.abspath(file_path)})
+            return jsonify({"success": True, "filePath": str(file_path_obj)})
 
         else:
             return jsonify({"success": False, "message": "用户取消保存"})
