@@ -1,9 +1,9 @@
 import json
-import os
 import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -75,21 +75,21 @@ def fetch_one(icao):
         payload = payload3
     session = requests.Session()
     session.headers.update(make_headers())
-    session.get("https://notams.aim.faa.gov/notamSearch/nsapp.html", timeout=7)
+    session.get("https://notams.aim.faa.gov/notamSearch/nsapp.html", timeout=config.FETCH_TIMEOUT)
     num = 30
     page = 0
     rslt = []
     while num == 30 and page < 100:
         try:
             payload["offset"] = str(page * 30)
-            response = session.post(url, data=payload, timeout=7)
+            response = session.post(url, data=payload, timeout=config.FETCH_TIMEOUT)
             if response.status_code == 200:
                 data = response.json()
                 num = len(data.get('notamList', []))
                 rslt.extend(process_notam_data(data))
             else:
                 print(f"[{icao}]-{page} 请求失败，状态码: {response.status_code}")
-                raise
+                raise requests.RequestException(f"Status code: {response.status_code}")
         except Exception as e:
             print(f"[{icao}]-{page} 请求错误: {e}")
             raise
@@ -171,7 +171,8 @@ def fetch():
         }
     }
     output_data["results"] = dict(sorted(results.items()))
-    with open("notam_results.json", "w", encoding="utf-8") as f:
+    json_path = config.BASE_DIR / "notam_results.json"
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(output_data, f, indent=2, ensure_ascii=False)
     print(f"全部 ICAO 和 自由文字 (FUCK) 检索完成")
     print(f"成功: {success_cnt} / 失败: {fail_cnt}")
@@ -180,10 +181,10 @@ def fetch():
 
 
 def FNS_NOTAM_SEARCH():
-    json_path = "notam_results.json"
+    json_path = config.BASE_DIR / "notam_results.json"
     now = time.time()
     results = {}
-    if os.path.exists(json_path):
+    if json_path.exists():
         with open(json_path, "r", encoding="utf-8") as f:
             try:
                 data = json.load(f)

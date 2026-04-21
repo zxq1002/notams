@@ -1,13 +1,15 @@
 """
 从notams.faa.gov网站爬取航警
 """
-import os
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+
+import config
 
 
 def dinsQueryWeb(icao_codes):
@@ -97,9 +99,8 @@ def dinsQueryWeb(icao_codes):
     }
 
     try:
-        response = requests.post(form_url, headers=headers, data=post_data)
+        response = requests.post(form_url, headers=headers, data=post_data, timeout=config.FETCH_TIMEOUT)
         response.raise_for_status()
-
     except requests.RequestException as e:
         print(f"[dinsQueryWeb] 请求失败: {e}")
         return {
@@ -110,11 +111,10 @@ def dinsQueryWeb(icao_codes):
             "ERROR": str(e)
         }
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    html_file = os.path.join(current_dir, "dinsQueryWeb_response.html")
+    current_dir = Path(__file__).resolve().parent
+    html_file = current_dir / "dinsQueryWeb_response.html"
     try:
-        with open(html_file, 'w', encoding='utf-8') as file:
-            file.write(response.text)
+        html_file.write_text(response.text, encoding='utf-8')
     except Exception as e:
         print(f"[dinsQueryWeb] 保存HTML文件失败: {e}")
 

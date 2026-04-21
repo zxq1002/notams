@@ -4,7 +4,7 @@ https://msi.nga.mil/
 """
 import re
 import json
-import os
+from pathlib import Path
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
@@ -607,14 +607,13 @@ def MSI_NAV_SEARCH():
     print("[进度] 开始爬取U.S. Maritime Administration海警...")
     
     # 缓存文件路径
-    cache_file = 'msi_result.json'
+    cache_file = config.BASE_DIR / 'msi_result.json'
     cache_timeout = config.MSI_FETCH_EXPIRE_TIME
     
     # 检查缓存
-    if os.path.exists(cache_file) and not DEBUG:
+    if cache_file.exists() and not DEBUG:
         try:
-            with open(cache_file, 'r', encoding='utf-8') as f:
-                cache_data = json.load(f)
+            cache_data = json.loads(cache_file.read_text(encoding='utf-8'))
             
             cache_time = datetime.fromisoformat(cache_data.get('timestamp', '2000-01-01'))
             if (datetime.now() - cache_time).total_seconds() < cache_timeout:
@@ -655,6 +654,9 @@ def MSI_NAV_SEARCH():
             url = future_to_url[future]
             try:
                 local_result = future.result()
+                if isinstance(local_result, dict) and "ERROR" in local_result:
+                    print(f"[警告] {url} 请求返回错误: {local_result['ERROR']}")
+                    continue
                 # 合并结果
                 for key in result.keys():
                     result[key].extend(local_result[key])
@@ -669,8 +671,7 @@ def MSI_NAV_SEARCH():
             'timestamp': datetime.now().isoformat(),
             'data': result
         }
-        with open(cache_file, 'w', encoding='utf-8') as f:
-            json.dump(cache_data, f, ensure_ascii=False, indent=2)
+        cache_file.write_text(json.dumps(cache_data, ensure_ascii=False, indent=2), encoding='utf-8')
         print(f"[进度] 数据已缓存到 {cache_file}")
     except Exception as e:
         print(f"[警告] 保存缓存失败: {e}")

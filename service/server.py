@@ -529,7 +529,9 @@ def fetch():
 
     if config.FETCH_DINS:
         dins_data = dinsQueryWeb(current_icao_codes)
-        if dins_data.get("CODE"):
+        if dins_data and isinstance(dins_data, dict) and "ERROR" in dins_data:
+            print(f"[错误] DINS 爬取失败: {dins_data['ERROR']}")
+        elif dins_data.get("CODE"):
             source_num += 1
             for i, code in enumerate(dins_data["CODE"]):
                 coords = dins_data["COORDINATES"][i]
@@ -773,3 +775,12 @@ def start_flask():
     log.addHandler(flask_handler)
 
     app.run(host=config.HOST, port=config.PORT, debug=False, use_reloader=False, threaded=True)
+
+
+_window = None
+
+
+def set_window(window_instance):
+    """设置 pywebview 窗口实例以便后续调用"""
+    global _window
+    _window = window_instance

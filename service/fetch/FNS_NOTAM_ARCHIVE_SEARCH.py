@@ -162,10 +162,12 @@ def fetch(icao, date, mode=0):
 
 def FNS_NOTAM_ARCHIVE_SEARCH(icao, date, mode=0):
     print(f"[进度] ========== 开始历史航警检索 ==========")
-    print(
-        f"[进度] 日期: {date}, 区域: {icao if mode == 1 else '内陆及近海'}, 模式: {'single' if mode == 1 else 'multi'}")
+    print(f"[进度] 日期: {date}, 区域: {icao if mode == 1 else '内陆及近海'}, 模式: {'single' if mode == 1 else 'multi'}")
     results = fetch(icao, date, mode)
+    if isinstance(results, dict) and "ERROR" in results:
+        return results
     print(f"[进度] 开始解析航警数据...")
+
 
     def standardize_coordinate(coord):
         coord = coord.replace(' ', '')
