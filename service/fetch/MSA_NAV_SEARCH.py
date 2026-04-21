@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import requests
+import config
 
 # 调试模式：True时不过滤过期航警
 DEBUG = True
@@ -45,6 +46,7 @@ def parse_coordinates(text):
     
     all_matches = matches1 + matches2 + matches3
     
+    seen = set()
     for match in all_matches:
         lat_deg, lat_min_int, lat_min_dec, lat_dir, lon_deg, lon_min_int, lon_min_dec, lon_dir = match
         
@@ -58,7 +60,10 @@ def parse_coordinates(text):
         formatted_lat = f"{lat_dir}{int(lat_deg):02d}{lat_min:02d}{lat_sec:02d}"
         formatted_lon = f"{lon_dir}{int(lon_deg):03d}{lon_min:02d}{lon_sec:02d}"
         
-        coords.append(formatted_lat + formatted_lon)
+        coord_pair = formatted_lat + formatted_lon
+        if coord_pair not in seen:
+            coords.append(coord_pair)
+            seen.add(coord_pair)
     
     return coords
 
@@ -193,12 +198,12 @@ def MSA_NAV_SEARCH():
     
     try:
         # 1. 获取目录页
-        response = requests.get(index_url, headers=make_headers(), timeout=15)
+        response = requests.get(index_url, headers=make_headers(), timeout=config.FETCH_TIMEOUT)
         response.encoding = 'utf-8'
         
         if response.status_code != 200:
             print(f"[错误] 获取目录页失败，状态码: {response.status_code}")
-            return result
+            return {"ERROR": f"获取目录页失败，状态码: {response.status_code}"}
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
@@ -242,7 +247,7 @@ def MSA_NAV_SEARCH():
             article_id = extract_article_id(href)
             
             try:
-                detail_response = requests.get(detail_url, headers=make_headers(), timeout=15)
+                detail_response = requests.get(detail_url, headers=make_headers(), timeout=config.FETCH_TIMEOUT)
                 detail_response.encoding = 'utf-8'
                 
                 if detail_response.status_code != 200:
