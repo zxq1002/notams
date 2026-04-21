@@ -12,13 +12,27 @@
 - &ensp;&ensp;&ensp;&ensp;获取NOTAM的方法请移步小工具的帮助。
  
 **二、关于这个小工具**<br>
+- &ensp;&ensp;&ensp;&ensp;该工具是一个跨平台的桌面应用，支持 Windows、macOS 和 Linux。 <br>
 - &ensp;&ensp;&ensp;&ensp;该工具通过爬取NOTAM查询网站，分析并获取与发射相关的航警，将NOTAM内容解析并调用Leafletjs api并加载高德地图瓦片源将其绘制在地图上，以便更直观方便的进行查询。 <br>
+- &ensp;&ensp;&ensp;&ensp;**环境要求**：Python 3.9 或更高版本。 <br>
 
-**三、工具使用方法与功能介绍**<br>
-- &ensp;&ensp;&ensp;&ensp;解压完成后，运行目录中的notamChecker.exe  <br>
-- &ensp;&ensp;&ensp;&ensp;如果是未打包的项目文件，请先运行`pip3 install -r requirements.txt`安装依赖库，然后直接运行`python3 main.py`即可  <br>
-- &ensp;&ensp;&ensp;&ensp;之后会直接弹出工具页面，你也可以直接在浏览器访问 http://127.0.0.1:5000 来实用工具工具（ip和端口可以在_internal/config.ini里进行配置）。  <br>
-- &ensp;&ensp;&ensp;&ensp;地图上已将我国现有的四个发射场与一个航天港（酒泉、西昌、太原、文昌、海阳）标出，进入工具页面后会自动抓取一次航警信息，并在界面上将未来一段时间的发射落区绘制出来。左上角的区域可以自行选定这些航警的颜色，下方的“移除自动绘制落区”按钮则可以删除这些自动绘制的落区。点击右侧的“自动获取落区列表”按钮后会展开一个展示所有自动获取的落区的列表，点击相应航警会将地图视角跳转至该航警处。展开“手动输入航警”栏可以自行输入并绘制航警。高德地图也有卫星地图瓦片源，因此该工具也可以选择在卫星地图图层下使用。
+**三、工具使用方法与环境配置**<br>
+1. **安装环境**：<br>
+- &ensp;&ensp;&ensp;&ensp;确保已安装 Python 3.9+。<br>
+- &ensp;&ensp;&ensp;&ensp;在终端/命令行执行：`pip3 install -r requirements.txt` 安装依赖库（包括 `pywebview`, `pyperclip`, `pytest` 等）。<br>
+- &ensp;&ensp;&ensp;&ensp;**macOS 用户**：pywebview 在 macOS 上使用原生 WebKit 渲染。<br>
+- &ensp;&ensp;&ensp;&ensp;**Linux 用户**：可能需要安装额外的系统库（如 `python3-tk` 或 GTK/Webkit 开发库），详见 pywebview 官方文档。<br>
+- &ensp;&ensp;&ensp;&ensp;*注意：本项目已实现全平台原生支持，不再依赖 pywin32。*<br>
+
+2. **运行工具**：<br>
+- &ensp;&ensp;&ensp;&ensp;在项目根目录执行：`python3 main.py`<br>
+- &ensp;&ensp;&ensp;&ensp;应用将以原生窗口形式启动。你也可以直接在浏览器访问 http://127.0.0.1:5000 来使用工具（ip和端口可以在 config.ini 里进行配置）。<br>
+- &ensp;&ensp;&ensp;&ensp;Windows 用户也可以使用预编译的 `notamChecker.exe`（如果可用）。<br>
+
+3. **功能介绍**：<br>
+- &ensp;&ensp;&ensp;&ensp;地图上已将我国现有的四个发射场与一个航天港（酒泉、西昌、太原、文昌、海阳）标出，进入工具页面后会自动抓取一次航警信息，并在界面上将未来一段时间的发射落区绘制出来。<br>
+- &ensp;&ensp;&ensp;&ensp;**原生交互**：采用原生系统通知和文件对话框（基于 pywebview），支持点击坐标自动复制到剪贴板（基于 pyperclip）。<br>
+- &ensp;&ensp;&ensp;&ensp;左上角的区域可以自行选定这些航警的颜色，下方的“移除自动绘制落区”按钮则可以删除这些自动绘制的落区。点击右侧的“自动获取落区列表”按钮后会展开一个展示所有自动获取的落区的列表，点击相应航警会将地图视角跳转至该航警处。展开“手动输入航警”栏可以自行输入并绘制航警。高德地图也有卫星地图瓦片源，因此该工具也可以选择在卫星地图图层下使用。<br>
 
 **其它页面**
 
