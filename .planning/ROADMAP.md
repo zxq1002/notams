@@ -45,7 +45,7 @@
   2. A basic test suite verifies core NOTAM parsing and data fetching logic.
   3. Documentation (README) is updated with platform-specific setup instructions.
 **Plans**:
-- [ ] 03-01-PLAN.md — Establish an automated testing foundation with pytest.
+- [x] 03-01-PLAN.md — Establish an automated testing foundation with pytest.
 - [ ] 03-02-PLAN.md — Update README.md and perform final manual verification on macOS.
 **UI hint**: yes
 
@@ -55,4 +55,4 @@
 |-------|----------------|--------|-----------|
 | 1. Core Compatibility | 2/2 | Completed | 2026-04-20 |
 | 2. Enhancement | 2/2 | Completed | 2026-04-20 |
-| 3. Validation | 0/2 | Planned | - |
+| 3. Validation | 1/2 | In Progress | - |
