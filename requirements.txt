@@ -8,3 +8,6 @@ shapely>=2.0.0
 pillow>=10.0.0
 Flask>=3.1.2
 pyperclip>=1.9.0
+
+# Dev Dependencies
+pytest>=8.0.0
